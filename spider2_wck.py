@@ -28,8 +28,7 @@ def scrape_page(url):
         response = requests.get(url)
         if response.status_code == 200:
             return response.text
-        logging.error('get invalid status code %s while scraping %s',
-                      response.status_code, url)
+        logging.error('get invalid status code %s while scraping %s', response.status_code, url)
     except requests.RequestException:
         logging.error('error occurred while scraping %s', url, exc_info=True)
 
@@ -61,7 +60,7 @@ def parse_index(html):
 
 def scrape_detail(url):
     """
-    scrape detail page and return its html
+    scrape detail page ane return its html
     :param url: url of detail page
     :return: html of detail page
     """
@@ -80,7 +79,7 @@ def parse_detail(html):
     name_pattern = re.compile('<h2.*?>(.*?)</h2>')
     categories_pattern = re.compile(
         '<button.*?category.*?<span>(.*?)</span>.*?</button>', re.S)
-    published_at_pattern = re.compile('(\d{4}-\d{2}-\d{2})\s?上映')
+    published_at_pattern = re.compile('(\d{4}-\d{2}-\d{2}\s?上映)')
     drama_pattern = re.compile('<div.*?drama.*?>.*?<p.*?>(.*?)</p>', re.S)
     score_pattern = re.compile('<p.*?score.*?>(.*?)</p>', re.S)
 
@@ -98,12 +97,12 @@ def parse_detail(html):
                   ) if re.search(score_pattern, html) else None
 
     return {
-        'cover': cover,
-        'name': name,
-        'categories': categories,
-        'published_at': published_at,
-        'drama': drama,
-        'score': score
+        "cover": cover,
+        "name": name,
+        "categories": categories,
+        "published_at": published_at,
+        "drama": drama,
+        "score": score
     }
 
 
@@ -113,8 +112,8 @@ def save_data(data):
     :param data:
     :return:
     """
-    name = data.get('name')
-    data_path = f'{RESULTS_DIR}/{name}.json'
+    name = data.get("name")
+    data_path = f"{RESULTS_DIR}/{name}.json"
     json.dump(data, open(data_path, 'w', encoding='utf-8'),
               ensure_ascii=False, indent=2)
 
@@ -129,10 +128,10 @@ def main(page):
     for detail_url in detail_urls:
         detail_html = scrape_detail(detail_url)
         data = parse_detail(detail_html)
-        logging.info('get detail data %s', data)
-        logging.info('saving data to json file')
+        logging.info(f"get detail data {data}")
+        logging.info(f"saving data to json file")
         save_data(data)
-        logging.info('data saved successfully')
+        logging.info("data saved successfully")
 
 
 if __name__ == '__main__':
@@ -140,3 +139,4 @@ if __name__ == '__main__':
     pages = range(1, TOTAL_PAGE + 1)
     pool.map(main, pages)
     pool.close()
+    pool.join()
